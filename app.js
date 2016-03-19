@@ -19,7 +19,7 @@ function getAllPortentialCodeString(){
 	var potential_tags = [];
 	var $dom_potential = document.querySelectorAll(".item.integration_item .block p.value.body"),
 		$normal_message_potential = document.querySelectorAll(".post>p.post_text");
-	var _regex = /^(``` (c#|c\+\+|c|java|ruby|js|python))([\s\S]*?)```/
+	var _regex = /(``` (c#|c\+\+|c|java|ruby|js|python))([\s\S]*?)```/
 	for(var i=0, N=$dom_potential.length;i<N;i++){
 		var _tag = $dom_potential[i];
 		var _html = _tag.innerHTML;
