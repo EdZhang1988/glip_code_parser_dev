@@ -19,7 +19,7 @@ function getAllPortentialCodeString(){
 	var potential_tags = [];
 	var $dom_potential = document.querySelectorAll(".item.integration_item .block p.value.body"),
 		$normal_message_potential = document.querySelectorAll(".post>p.post_text");
-	var _regex = /^(``` (java|ruby|js|python))([\s\S]*?)```/
+	var _regex = /^(``` (c#|c\+\+|c|java|ruby|js|python))([\s\S]*?)```/
 	for(var i=0, N=$dom_potential.length;i<N;i++){
 		var _tag = $dom_potential[i];
 		var _html = _tag.innerHTML;
@@ -32,7 +32,7 @@ function getAllPortentialCodeString(){
 		var _tag = $normal_message_potential[i];
 		var _html = _tag.innerHTML;
 		var _matched = _html.match(_regex);
-		if(_matched && 'none'!==$normal_message_potential[i].style.display && !_tag.hasAttribute('GCPD_Checked')){
+		if(_matched && 'none'!==$normal_message_potential[i].style.display && !_tag.hasAttribute('GCPD_Checked') && !_tag.hasAttribute('GCPD_Editing')){
 			potential_tags.push($normal_message_potential[i]);
 		}
 	}
@@ -41,8 +41,6 @@ function getAllPortentialCodeString(){
 		refresh_lock=false;
 		return ;
 	}
-	
-
 	
 	var _release_lock = false;
 	for(var i=0, N=potential_tags.length;i<N;i++){
@@ -67,7 +65,7 @@ function getAllPortentialCodeString(){
 
 }
 
-function replaceCodeSnippet($dom, replacement, _release_lock){
+function replaceCodeSnippet($dom, replacement, _release_lock, language){
 	if(replacement!==""){
 		var $parent = $dom.parentNode;
 		if($dom.style.display==='none'){
@@ -80,7 +78,9 @@ function replaceCodeSnippet($dom, replacement, _release_lock){
 			return ;
 		}
 		var $child = document.createElement('div');
-		$child.innerHTML =replacement;
+		$child.classList = "gcpd-code-block";
+		var $title = "<label class='gcpd-code-block'>"+language+"</label>";
+		$child.innerHTML =$title+replacement;
 		$parent.appendChild($child);
 		console.log(_release_lock);	
 	} else {
@@ -105,12 +105,31 @@ function sendCodeSnippetForParse($dom, _release_lock, _snippet, callback){
 		console.log(response);
 		_html = response.snippet
 		if(_html){
-			callback($dom, _html, _release_lock);
+			callback($dom, _html, _release_lock, _snippet.language);
 		} else {
 			callback($dom, "", _release_lock);
 		}
 	});
 	
+}
+
+function checkCodeEditing(){
+	var $editing = document.querySelectorAll('.post.editing .gcpd-code-block');
+
+	for(var i=0,N=$editing.length;i<N;i++){
+		var $d = $editing[i].parentNode;
+		var $parentNode = $d.parentNode;
+
+		var $p = $parentNode.querySelector('p');
+		if($p.style.display==='none'){
+			$p.style.display=null;
+		} else if($p.hasAttribute('GCPD_Checked')){
+			$p.removeAttribute('GCPD_Checked');
+		}
+		$p.setAttribute('GCPD_Editing',"true");
+		$parentNode.removeChild($d);
+	}
+
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse){
@@ -146,5 +165,7 @@ setInterval(function(){
 	}
 	
 	getAllPortentialCodeString();
+
+	checkCodeEditing();
 },1000);
 
