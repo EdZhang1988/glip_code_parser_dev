@@ -24,7 +24,7 @@ function getAllPortentialCodeString(){
 		var _tag = $dom_potential[i];
 		var _html = _tag.innerHTML;
 		var _matched = _html.match(_regex);
-		if(_matched && 'none'!==$dom_potential[i].style.display){
+		if(_matched && 'none'!==$dom_potential[i].style.display && !_tag.hasAttribute('GCPD_Checked')){
 			potential_tags.push($dom_potential[i]);
 		}
 	}
@@ -32,7 +32,7 @@ function getAllPortentialCodeString(){
 		var _tag = $normal_message_potential[i];
 		var _html = _tag.innerHTML;
 		var _matched = _html.match(_regex);
-		if(_matched && 'none'!==$normal_message_potential[i].style.display){
+		if(_matched && 'none'!==$normal_message_potential[i].style.display && !_tag.hasAttribute('GCPD_Checked')){
 			potential_tags.push($normal_message_potential[i]);
 		}
 	}
@@ -68,7 +68,7 @@ function getAllPortentialCodeString(){
 }
 
 function replaceCodeSnippet($dom, replacement, _release_lock){
-	if($dom!==""){
+	if(replacement!==""){
 		var $parent = $dom.parentNode;
 		if($dom.style.display==='none'){
 			return ;
@@ -83,12 +83,21 @@ function replaceCodeSnippet($dom, replacement, _release_lock){
 		$child.innerHTML =replacement;
 		$parent.appendChild($child);
 		console.log(_release_lock);	
+	} else {
+		$dom.setAttribute('GCPD_Checked', 'true')
 	}
 	
 	refresh_lock = !_release_lock;
 }
 
 function sendCodeSnippetForParse($dom, _release_lock, _snippet, callback){
+	var filter_reg = /<a[\s\S]*?>([\s\S]*?)<\/a>/;
+	
+	while(_snippet.code.match(filter_reg)){
+		var _replace = _snippet.code.match(filter_reg)[1];
+		_snippet.code = _snippet.code.replace(filter_reg, _replace);
+	}
+
 	chrome.runtime.sendMessage({
 		command: "parseCode",
 		snippet: _snippet
@@ -98,7 +107,7 @@ function sendCodeSnippetForParse($dom, _release_lock, _snippet, callback){
 		if(_html){
 			callback($dom, _html, _release_lock);
 		} else {
-			callback("", "", _release_lock);
+			callback($dom, "", _release_lock);
 		}
 	});
 	
