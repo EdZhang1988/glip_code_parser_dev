@@ -19,6 +19,7 @@ function getAllPortentialCodeString(){
 	var potential_tags = [];
 	var $dom_potential = document.querySelectorAll(".item.integration_item .block p.value.body"),
 		$normal_message_potential = document.querySelectorAll(".post>p.post_text");
+	var _regex = /^(``` (java|ruby|js|python))([\s\S]*?)```/
 	for(var i=0, N=$dom_potential.length;i<N;i++){
 		var _tag = $dom_potential[i];
 		var _html = _tag.innerHTML;
@@ -42,7 +43,7 @@ function getAllPortentialCodeString(){
 	}
 	
 
-	var _regex = /^(``` (java|ruby|js|python))([\s\S]*?)```/
+	
 	var _release_lock = false;
 	for(var i=0, N=potential_tags.length;i<N;i++){
 		var index = N-i-1;
@@ -67,19 +68,23 @@ function getAllPortentialCodeString(){
 }
 
 function replaceCodeSnippet($dom, replacement, _release_lock){
-	var $parent = $dom.parentNode;
-	if($dom.style.display==='none'){
-		return ;
+	if($dom!==""){
+		var $parent = $dom.parentNode;
+		if($dom.style.display==='none'){
+			return ;
+		}
+		$dom.style.display='none';
+		if(!$parent){
+			console.log("error");
+			console.log($dom);
+			return ;
+		}
+		var $child = document.createElement('div');
+		$child.innerHTML =replacement;
+		$parent.appendChild($child);
+		console.log(_release_lock);	
 	}
-	$dom.style.display='none';
-	if(!$parent){
-		console.log("error");
-		console.log($dom);
-		return ;
-	}
-	var $child = document.createElement('div');
-	$child.innerHTML =replacement;
-	$parent.appendChild($child);
+	
 	refresh_lock = !_release_lock;
 }
 
@@ -92,6 +97,8 @@ function sendCodeSnippetForParse($dom, _release_lock, _snippet, callback){
 		_html = response.snippet
 		if(_html){
 			callback($dom, _html, _release_lock);
+		} else {
+			callback("", "", _release_lock);
 		}
 	});
 	
