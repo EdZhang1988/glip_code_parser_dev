@@ -1,0 +1,31 @@
+{
+  "manifest_version": 2,
+
+  "name": "Glip chat code formattor",
+  "description": "This extension can automatically format code snippets in Glip conversation",
+  "version": "1.0",
+  "permissions": [
+    "activeTab",
+    "https://*.glip.com/",
+    "https://glip.com/",
+    "http://hilite.me/*"
+  ],
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [{
+      "matches": [
+        "https://*/*"
+      ],
+      // "css": ["css/bootstrap.min.css"],
+      "js": [
+        "js/jquery.min.js",
+        "app.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "background": { "scripts": ["js/jquery.min.js","background.js"] }
+}
