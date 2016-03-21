@@ -8,6 +8,8 @@ When you want to share a code snippet,
 please use Markdown code format
 
 "``` language"
-"<code>"
+
+your code snippet
+
 "```"
 
