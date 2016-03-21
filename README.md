@@ -7,9 +7,9 @@ Refresh your Glip page.
 When you want to share a code snippet,
 please use Markdown code format
 
-"``` language"
+"``` language
 
 your code snippet
 
-"```"
+```"
 
